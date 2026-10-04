@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GIS Mapping of Chandaka, Similipatana, Bhubaneswar</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --green:#2e7d32; --ink:#1f2933; --bg:#f4f7f5; --card:#fff; --line:#dde5df; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  header { background:var(--green); color:#fff; padding:28px 16px; text-align:center; }
+  header h1 { margin:0 0 6px; font-size:1.7rem; }
+  header p { margin:0; opacity:.9; }
+  main { max-width:1000px; margin:0 auto; padding:16px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin:16px 0; }
+  h2 { margin-top:0; color:var(--green); font-size:1.25rem; }
+  #map { height:520px; border-radius:8px; border:1px solid var(--line); }
+  .filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .filters label { display:flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--line); border-radius:999px; cursor:pointer; font-size:.9rem; background:#fafcfb; }
+  .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
+  .pin { width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; font-size:14px; }
+  ul, ol { padding-left:22px; }
+  .note { font-size:.9rem; color:#5b6b61; border-left:4px solid var(--green); padding-left:12px; }
+  footer { text-align:center; padding:16px; font-size:.85rem; color:#5b6b61; }
+  @media (max-width:600px){ #map{height:400px;} header h1{font-size:1.35rem;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>GIS Mapping of My Local Area</h1>
+  <p>Study Area: Chandaka, Similipatana, Bhubaneswar, Odisha</p>
+</header>
+
+<main>
+  <section>
+    <h2>Introduction</h2>
+    <p>Geographic Information System (GIS) is a technology used to collect, store, analyze and display information related to places on a map.</p>
+  </section>
+
+  <section>
+    <h2>Our Local Area</h2>
+    <p>This project shows a simple GIS map of the local area around Chandaka, Similipatana, Bhubaneswar, Odisha. The map represents important public features such as roads, schools, health facilities, markets and green areas.</p>
+    <div class="filters" id="filters" aria-label="Map layers"></div>
+    <div id="map" role="application" aria-label="Interactive GIS map of the study area"></div>
+    <p class="note" style="margin-top:12px">Click a marker or road for details. Use the checkboxes to show or hide each layer.</p>
+  </section>
+
+  <section>
+    <h2>Important Features</h2>
+    <ul>
+      <li>Main Roads</li>
+      <li>School</li>
+      <li>Health Centre/Hospital</li>
+      <li>Market</li>
+      <li>Green Area/Park</li>
+      <li>Important Public Places</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Uses of GIS</h2>
+    <ol>
+      <li>Helps us understand locations easily.</li>
+      <li>Helps in planning roads and public facilities.</li>
+      <li>Helps identify important places on a map.</li>
+      <li>Helps in managing natural and urban areas.</li>
+      <li>Makes geographical information easier to understand.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Conclusion</h2>
+    <p>GIS is a useful technology for studying and managing our local area. It helps us understand different places and their locations through maps.</p>
+  </section>
+
+  <p class="note">Note: This is an illustrative school-project map and does not show an exact private house location.</p>
+</main>
+
+<footer>GIS School Project &middot; Map data &copy; OpenStreetMap contributors</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // All coordinates are approximate and illustrative.
+  var center = [20.3700, 85.8150];
+  var map = L.map('map').setView(center, 13);
+
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, attribution: 'Tiles &copy; Esri'
+  });
+  L.control.layers({ 'Street map': osm, 'Satellite': sat }, null, { position: 'topright' }).addTo(map);
+  L.control.scale().addTo(map);
+
+  // Study area marker (approximate centre, not a house)
+  L.circle(center, { radius: 2500, color: '#2e7d32', weight: 2, dashArray: '6 6', fillOpacity: .04 })
+    .addTo(map).bindPopup('<b>Study area</b><br>Chandaka &ndash; Similipatana (approximate)');
+
+  var categories = {
+    roads:  { label: 'Main Roads',       color: '#d84315', icon: '' },
+    school: { label: 'Schools',          color: '#1565c0', icon: '🏫' },
+    health: { label: 'Health Centres',   color: '#c62828', icon: '🏥' },
+    market: { label: 'Markets',          color: '#ef6c00', icon: '🛒' },
+    green:  { label: 'Green Areas/Parks',color: '#2e7d32', icon: '🌳' },
+    public: { label: 'Public Places',    color: '#6a1b9a', icon: '🏛️' }
+  };
+
+  var points = [
+    ['school','KIIT University (area)', 20.3553, 85.8170, 'Large educational campus nearby.'],
+    ['school','Local Government School', 20.3820, 85.8080, 'Illustrative primary/upper-primary school.'],
+    ['school','Private High School', 20.3650, 85.8260, 'Illustrative secondary school.'],
+    ['health','Community Health Centre', 20.3760, 85.8210, 'Illustrative public health facility.'],
+    ['health','Private Hospital', 20.3540, 85.8230, 'Illustrative multi-speciality hospital.'],
+    ['market','Chandaka Local Market', 20.3730, 85.8110, 'Daily vegetable and grocery market.'],
+    ['market','Similipatana Bazaar', 20.3880, 85.8180, 'Neighbourhood shopping area.'],
+    ['green','Chandaka Forest (edge)', 20.4050, 85.7900, 'Chandaka-Dampara forest area, home to elephants and other wildlife.'],
+    ['green','Community Park', 20.3680, 85.8200, 'Illustrative public park.'],
+    ['public','Post Office', 20.3710, 85.8140, 'Illustrative public service point.'],
+    ['public','Police Station', 20.3790, 85.8120, 'Illustrative public service point.'],
+    ['public','Community Hall / Temple', 20.3840, 85.8230, 'Illustrative community gathering place.']
+  ];
+
+  var roads = [
+    ['NH-16 / Bhubaneswar-Cuttack Link (illustrative)', [[20.3400,85.8000],[20.3550,85.8080],[20.3700,85.8140],[20.3860,85.8200],[20.4000,85.8280]]],
+    ['Chandaka Main Road (illustrative)', [[20.3700,85.7900],[20.3720,85.8040],[20.3730,85.8140],[20.3750,85.8300]]],
+    ['Infocity-Patia Connector (illustrative)', [[20.3480,85.8190],[20.3560,85.8230],[20.3650,85.8270]]]
+  ];
+
+  var groups = {};
+  Object.keys(categories).forEach(function (k) { groups[k] = L.layerGroup().addTo(map); });
+
+  points.forEach(function (p) {
+    var c = categories[p[0]];
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="pin" style="background:' + c.color + '">' + c.icon + '</div>',
+      iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -12]
+    });
+    L.marker([p[2], p[3]], { icon: icon, title: p[1] })
+      .bindPopup('<b>' + p[1] + '</b><br><i>' + c.label + '</i><br>' + p[4])
+      .addTo(groups[p[0]]);
+  });
+
+  roads.forEach(function (r) {
+    L.polyline(r[1], { color: categories.roads.color, weight: 5, opacity: .85 })
+      .bindPopup('<b>' + r[0] + '</b><br><i>Main Road</i>')
+      .addTo(groups.roads);
+  });
+
+  // Layer checkboxes
+  var box = document.getElementById('filters');
+  Object.keys(categories).forEach(function (k) {
+    var c = categories[k];
+    var label = document.createElement('label');
+    label.innerHTML = '<input type="checkbox" checked> <span class="dot" style="background:' + c.color + '"></span> ' + c.label;
+    label.querySelector('input').addEventListener('change', function (e) {
+      if (e.target.checked) map.addLayer(groups[k]); else map.removeLayer(groups[k]);
+    });
+    box.appendChild(label);
+  });
+</script>
+</body>
+</html>
